@@ -7,7 +7,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 from datetime import datetime
 import wandb
 import torch
-from torch.cuda.amp import autocast, GradScaler
+from torch.cuda.amp import GradScaler
 import torch.multiprocessing as mp
 from torch.nn.parallel import DistributedDataParallel
 from torch.distributed import init_process_group
@@ -22,6 +22,7 @@ from setup import (
 )
 
 torch.backends.cudnn.benchmark=True
+device_type = "cuda" if torch.cuda.is_available() else "cpu"
 
 current_time = datetime.now()
 formatted_time = current_time.strftime("%Y_%m_%d-%H_%M_%S")
@@ -119,7 +120,7 @@ def Train(rank, cfg, args):
             input_values = batch['input_values'].to(device, non_blocking=True)
             labels = batch['labels'].to(device, non_blocking=True)
 
-            with torch.autocast(device_type=device, dtype=torch.float16, enabled=cfg['training_config']['mixed_precision']):
+            with torch.autocast(device_type=device_type, dtype=torch.float16, enabled=cfg['training_config']['mixed_precision']):
                 loss = model(input_values=input_values, labels=labels).loss
             scaler.scale(loss).backward()
             
