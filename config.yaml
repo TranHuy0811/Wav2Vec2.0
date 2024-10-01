@@ -1,0 +1,38 @@
+env_config:
+  num_gpus: 2
+  num_workers: 4
+  seed: 1234
+  eval_interval: 2000
+  log_interval: 1
+  checkpoint_interval: 2000
+  stdout_interval: 50
+  checkpoint_saving_limit : 1
+
+  dist_config:
+    dist_backend: nccl 
+    dist_url: tcp://localhost:19477 
+    world_size: 1  
+
+
+
+training_config:
+  train_epochs: 1
+  train_batch_size: 4
+  train_gradient_accumulation: 16 
+  eval_batch_size: 4
+  learning_rate: 0.0001
+  weight_decay: 0.01
+  lr_decay: 0.99
+  lr_decay_interval: 100
+  adam_b1: 0.9
+  adam_b2: 0.999
+  max_grad_norm: 10.0
+
+
+
+dataset_config:
+  train_file_path: dataset_example/prompts.txt         # List of h5 file paths if you set 'use_h5_file' = True
+  eval_file_path: dataset_example/prompts.txt          # Same as above
+  sample_rate: 16000
+  use_h5_file: False     # As I used h5 files for storing dataset (dataset have been processed). You can ignore this. 
+                         # DO NOTE THAT H5 DATASET WON'T BE COMPATIBLE WITH DISTRIBUTED TRAINING        

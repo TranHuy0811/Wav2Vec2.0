@@ -1,0 +1,5 @@
+dataset_example/audio/audio1.wav	TRỞ NÊN THỤ ĐỘNG
+dataset_example/audio/audio2.wav	CŨNG KHIẾN CHO HỌ DÈ DẶT
+dataset_example/audio/audio3.wav	CHỊ GẶN HỎI ANH THỀ SỐNG THỀ CHẾT LÀ KHÔNG CÓ
+dataset_example/audio/audio4.wav	ĐIỆN THOẠI RENG NHƯNG TA CŨNG PHẢI NHẤC MÁY ĐÚNG KHÔNG
+dataset_example/audio/audio5.wav	CŨNG THUỘC LOẠI DÀY ĐẶC NHẤT TRONG HỆ MẶT TRỜI
