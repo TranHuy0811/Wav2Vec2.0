@@ -27,6 +27,7 @@ training_config:
   adam_b1: 0.9
   adam_b2: 0.999
   max_grad_norm: 10.0
+  mixed_precision: True
 
 
 

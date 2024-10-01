@@ -7,6 +7,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 from datetime import datetime
 import wandb
 import torch
+from torch.cuda.amp import autocast, GradScaler
 import torch.multiprocessing as mp
 from torch.nn.parallel import DistributedDataParallel
 from torch.distributed import init_process_group
@@ -105,7 +106,8 @@ def Train(rank, cfg, args):
 
     '''    Training    '''
     model.train()
-    optimizer.zero_grad()
+    scaler = GradScaler(enabled=cfg['training_config']['mixed_precision'])
+    optimizer.zero_grad(set_to_none=True)
     cur_grad_accu_step = 0
     accu_loss = 0
     checkpoint_queue = deque()
@@ -117,9 +119,10 @@ def Train(rank, cfg, args):
             input_values = batch['input_values'].to(device, non_blocking=True)
             labels = batch['labels'].to(device, non_blocking=True)
 
-            loss = model(input_values=input_values, labels=labels).loss
-            loss.backward()
-
+            with torch.autocast(device_type=device, dtype=torch.float16, enabled=cfg['training_config']['mixed_precision']):
+                loss = model(input_values=input_values, labels=labels).loss
+            scaler.scale(loss).backward()
+            
             accu_loss += loss.item()
 
             if torch.isnan(loss).any():
@@ -132,8 +135,9 @@ def Train(rank, cfg, args):
                 step += 1
 
                 torch.nn.utils.clip_grad_norm_(model.parameters(), cfg['training_config']['max_grad_norm'])
-                optimizer.step()
-                optimizer.zero_grad()
+                scaler.step(optimizer)
+                scaler.update()
+                optimizer.zero_grad(set_to_none=True)
             
                 if rank == 0:
                     
